@@ -34,12 +34,11 @@ jobs:
         run: |
           # Connect to EC2 and execute commands
           ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
-            set -e  # Exit on first error
-            cd /home/ubuntu/Python-EC2-GitHub-Actions || exit 1  # Navigate to app folder
-            git pull origin main || exit 1  # Pull latest changes
-            python3 -m pip install -r requirements.txt || exit 1  # Install dependencies
-            pkill -f app.py || true  # Kill any previous running Flask app, ignore if no process is found
-            nohup python3 app.py &  # Run Flask app in the background
+            cd /home/ubuntu/Python-EC2-GitHub-Actions || exit
+            git pull origin main || exit
+            python3 -m pip install -r requirements.txt || exit
+            pkill -f app.py || exit  # Kill any previous running Flask app
+            nohup python3 app.py &  # Run Flask app in background
           EOF
 
       - name: Deployment complete
