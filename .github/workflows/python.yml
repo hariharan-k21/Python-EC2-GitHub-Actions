@@ -40,15 +40,21 @@ jobs:
             # Pull latest changes from the repository
             git pull origin main || exit
 
-            # Install dependencies directly on the system Python
+            # Set up a Python virtual environment (if not already done)
+            if [ ! -d "venv" ]; then
+              python3 -m venv venv
+            fi
+
+            # Activate the virtual environment
+            source venv/bin/activate
+
+            # Install dependencies inside the virtual environment
             python3 -m pip install --upgrade pip || exit
             pip install -r requirements.txt || exit
 
             # Kill any previous running Flask app
             pkill -f app.py || exit
 
-            # Run Flask app in the background
+            # Run Flask app in the background within the virtual environment
             nohup python3 app.py &  # Run Flask app in the background
           EOF
-
-
