@@ -34,27 +34,31 @@ jobs:
         run: |
           # Connect to EC2 and execute commands
           ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+            set -e  # Exit immediately if any command fails
+
             # Navigate to the application directory
-            cd /home/ubuntu/Python-EC2-GitHub-Actions || exit
+            cd /home/ubuntu/Python-EC2-GitHub-Actions || { echo "Directory not found! Exiting."; exit 1; }
 
             # Pull latest changes from the repository
-            git pull origin main || exit
+            git pull origin main || { echo "Failed to pull changes from GitHub! Exiting."; exit 1; }
 
             # Set up a Python virtual environment (if not already done)
             if [ ! -d "venv" ]; then
-              python3 -m venv venv
+              python3 -m venv venv || { echo "Failed to create virtual environment! Exiting."; exit 1; }
             fi
 
             # Activate the virtual environment
-            source venv/bin/activate
+            source venv/bin/activate || { echo "Failed to activate virtual environment! Exiting."; exit 1; }
 
             # Install dependencies inside the virtual environment
-            python3 -m pip install --upgrade pip || exit
-            pip install -r requirements.txt || exit
+            python3 -m pip install --upgrade pip || { echo "Failed to upgrade pip! Exiting."; exit 1; }
+            pip install -r requirements.txt || { echo "Failed to install dependencies! Exiting."; exit 1; }
 
             # Kill any previous running Flask app
-            pkill -f app.py || exit
+            pkill -f app.py || echo "No existing Flask app to kill."
 
             # Run Flask app in the background within the virtual environment
-            nohup python3 app.py &  # Run Flask app in the background
+            nohup python3 app.py & || { echo "Failed to start Flask app! Exiting."; exit 1; }
+
+            echo "Deployment successful!"
           EOF
