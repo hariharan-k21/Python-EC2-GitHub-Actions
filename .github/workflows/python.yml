@@ -22,7 +22,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          apt install python3.12-venv
+          
 
       - name: Set up SSH
         run: |
@@ -38,20 +38,15 @@ jobs:
             # Navigate to the application directory
             cd /home/ubuntu/Python-EC2-GitHub-Actions || exit
             
-            # Pull latest changes from the repository
+            
+        # Pull latest changes from the repository
             git pull origin main || exit
             
-            # Create a virtual environment if it doesn't already exist
-            python3 -m venv venv || exit
-
-            # Activate the virtual environment
-            source venv/bin/activate
-
-            # Install dependencies inside the virtual environment
+        # Install dependencies inside the virtual environment
             python3 -m pip install --upgrade pip || exit
             pip install -r requirements.txt || exit
 
-            # Kill any previous running Flask app
+        # Kill any previous running Flask app
             pkill -f app.py || exit
 
             # Run Flask app in the background within the virtual environment
